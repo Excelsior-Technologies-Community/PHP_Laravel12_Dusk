@@ -17,19 +17,26 @@ class LoginTest extends DuskTestCase
 public function test_login_and_dashboard()
 {
     $user = \App\Models\User::factory()->create([
-        'email' => 'test@example.com',
-        'password' => bcrypt('123456'),
+        'email' => 'test' . time() . '@example.com',
+        'password' => bcrypt('password'),
     ]);
 
     $this->browse(function ($browser) use ($user) {
+
         $browser->visit('/login')
-                ->type('email', $user->email)       // name="email"
-                ->type('password', '123456')        // name="password"
+                ->pause(3000)
+
+                ->waitForText('Login', 10) //  ensures page loaded
+                ->assertPresent('input[name="email"]') //  check DOM
+
+                ->type('input[name="email"]', $user->email)
+                ->type('input[name="password"]', 'password')
+
                 ->press('Login')
-                ->waitForText('Dashboard', 10)
-                ->assertSee('Dashboard');
+                ->pause(3000)
+
+                ->assertPathIs('/dashboard');
     });
 }
-
 
 }
